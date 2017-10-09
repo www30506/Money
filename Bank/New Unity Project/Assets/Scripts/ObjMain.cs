@@ -32,13 +32,10 @@ public class ObjMain : MonoBehaviour {
 		int _year = p_month/12;
 		int _balance = p_month % 12;
 
-		if (_year == 0) {
-			return "第"+p_month+"個月";
-		}
-		if (_balance == 0) {
-			return "第"+_year+"年";
-		}
-		return "第"+_year+"年"+_balance+"個月";
+//		if (_year == 0) {
+//			return "第"+(p_month+1)+"個月";
+//		}
+		return "第"+(_year+1)+"年第"+(_balance+1)+"個月";
 	}
 
 	public void SetGreenColor(){
