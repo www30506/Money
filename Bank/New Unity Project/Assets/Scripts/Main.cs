@@ -13,13 +13,15 @@ public class Main : MonoBehaviour {
 	public Text maxSaveMoneyText;
 	public GameObject objPrefabds;
 	public Transform parent;
+	public Text StartAgeText;
 
+	private int StartAge;
 	private float interest_Year = 0.051024811218986f; //年利息
 	private float interest_Month = 0.0042520676015822f; //月利息
 	private float myBank = 0; //自己銀行帳戶的金額
 	private float totalSaveMoney; //總存金額
-	private float bankTotalSaveMoney; //配息帳戶雍有金額
-	private float totalGetSalary = 0; //總領利息
+	private float interest_Bank_Money; //配息帳戶雍有金額
+	private float total_Get_Interest = 0; //總領利息
 	private float maxSaveMoney = 0; //最大投入金額
 	private List<ObjMain> prefabsObjs = new List<ObjMain>();
 	public List<OneOfSaveMoney> saveMoneyList = new List<OneOfSaveMoney> ();
@@ -42,7 +44,7 @@ public class Main : MonoBehaviour {
 		}
 
 		for (int i = 1; i < prefabsObjs.Count; i++) {
-			if (i % 12 == 0) {
+			if (i % 12 == 11) {
 				prefabsObjs [i].SetGreenColor ();
 			}
 		}
@@ -64,12 +66,12 @@ public class Main : MonoBehaviour {
 				GameObject _prf = Instantiate (objPrefabds, new Vector3 (0, 0, 0), Quaternion.identity);
 				prefabsObjs.Add (_prf.GetComponent<ObjMain>());
 				_prf.transform.SetParent (parent, false);
-				if (month % 12 == 0) {
+				if (month % 12 == 11) {
 					prefabsObjs [month].SetGreenColor ();
 				}
 			}
 			prefabsObjs [month].gameObject.SetActive (true);
-			if (month % 12 == 0) {
+			if (month % 24 == 0) {
 				yield return null;
 			}
 		}
@@ -82,41 +84,36 @@ public class Main : MonoBehaviour {
 			myBank += salary;
 			float _interest_By_One_Month = GetInterest_By_One_Month ();
 			myBank += _interest_By_One_Month;
-			totalGetSalary += _interest_By_One_Month;
+			total_Get_Interest += _interest_By_One_Month;
 
 			if(myBank >= 300000 && totalSaveMoney < maxSaveMoney){
 				SaveMoneyToBank();
 			}
-//			if(myBank >= 300000 && isSave == false){
-//				isSave = true;
-//				SaveMoneyToBank();
-//			}
 
 			UpdateBankSaveMoney ();
 
 			prefabsObjs[month].SetData(
-				(month),
+				StartAge,
+				(month+1),
 				totalSaveMoney,
-				bankTotalSaveMoney,
+				interest_Bank_Money,
 				_interest_By_One_Month,
-				totalGetSalary
+				total_Get_Interest
 			);
-			if (month % 12 == 0) {
+			if (month % 36 == 0) {
 				yield return null;
 			}
 		}
 	}
 
-
-//	private bool isSave = false;
-
 	private void DataInit(){
 		myBank = 0;
-		bankTotalSaveMoney = 0;
-		totalGetSalary = 0;
+		interest_Bank_Money = 0;
+		total_Get_Interest = 0;
 		totalSaveMoney = 0;
 		saveMoneyList.Clear ();
 
+		StartAge = int.Parse (StartAgeText.text);
 		salary = int.Parse (salaryText.text);
 		interest_Year = float.Parse (interest_YearText.text);
 		totalYear = int.Parse (totalYearText.text);
@@ -149,7 +146,6 @@ public class Main : MonoBehaviour {
 		}
 
 		return _Total_Interest_By_One_Month;
-		return totalSaveMoney*(1-Fee) * interest_Month;
 	}
 
 	private int GetTotalSaveMoney(){
@@ -164,7 +160,7 @@ public class Main : MonoBehaviour {
 	}
 
 	private void UpdateBankSaveMoney (){
-		bankTotalSaveMoney = GetTotalSaveMoney();
+		interest_Bank_Money = GetTotalSaveMoney();
 	}
 
 	private void SaveMoneyToBank(){
